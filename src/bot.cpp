@@ -34,10 +34,10 @@ double static_eval(Board &s) {
 }
 
 
-double minimax(Board &s, int d, int &vis) {
+double minimax(Board &s, int d, double alpha, double beta, int &vis) {
     vis++;
-    if (vis%10==0) {
-        printf("minimax %d visited\n", vis);
+    if (vis%10000==0) {
+        printf("minimax visited %d\n", vis);
     }
 
     // gen moves
@@ -61,22 +61,26 @@ double minimax(Board &s, int d, int &vis) {
     if (s.turn()==Color::WHITE) {
         double mx=-1e9;
         for (act_t &a:moves) {
-            Board sp=s;
-            sp.make_move(a.src, a.dst);
-            double eval = minimax(sp, d-1, vis);
+            Piece cap = s.temp_move(a.src, a.dst);
+            double eval = minimax(s, d-1, alpha, beta, vis);
+            s.undo_move(a.src, a.dst, cap);
 
             mx=max(mx, eval);
+            alpha=max(alpha, eval);
+            if (beta<=alpha) break;
         }
 
         return mx;
     } else { // black
         double mn=1e9;
         for (act_t &a:moves) {
-            Board sp=s;
-            sp.make_move(a.src, a.dst);
-            double eval = minimax(sp, d-1, vis);
+            Piece cap = s.temp_move(a.src, a.dst);
+            double eval = minimax(s, d-1, alpha, beta, vis);
+            s.undo_move(a.src, a.dst, cap);
 
             mn=min(mn, eval);
+            beta=min(beta,eval);
+            if (beta<=alpha) break;
         }
 
         return mn;
@@ -89,6 +93,7 @@ act_t best_move(Board &s, int d) {
     for (int x=0; x<8; ++x) {
         for (int y=0; y<8; ++y) {
             for (int z=0; z<8; ++z) {
+                if (s.at(glm::ivec3(x,y,z)).color != s.turn()) continue;
                 glm::ivec3 pos(x,y,z);
                 vec<glm::ivec3> dst = s.possible_moves(pos);
                 for (glm::ivec3 p : dst) {
@@ -107,22 +112,22 @@ act_t best_move(Board &s, int d) {
     if (s.turn()==Color::WHITE) {
         double mx=-1e9;
         for (act_t a : moves) {
-            Board sp=s;
-            sp.make_move(a.src, a.dst);
-            if (ckmax(mx, minimax(sp, d, vis))) {
+            Piece cap = s.temp_move(a.src, a.dst);
+            if (ckmax(mx, minimax(s, d, -1e9, 1e9, vis))) {
                 best=a;
                 best_ev=mx;
             }
+            s.undo_move(a.src, a.dst, cap);
         }
     } else { // black
         double mn=1e9;
         for (act_t a : moves) {
-            Board sp=s;
-            sp.make_move(a.src, a.dst);
-            if (ckmin(mn, minimax(sp, d, vis))) {
+            Piece cap = s.temp_move(a.src, a.dst);
+            if (ckmin(mn, minimax(s, d, -1e9, 1e9, vis))) {
                 best=a;
                 best_ev=mn;
             }
+            s.undo_move(a.src, a.dst, cap);
         }
     }
 

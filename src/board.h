@@ -38,14 +38,13 @@ public:
     void rotate(glm::vec3 rot);
 
     void select(glm::ivec3 coord);
-    std::vector<glm::ivec3> possible_moves(glm::ivec3 coord, bool ignore_check = false);
+    std::vector<glm::ivec3> possible_moves(glm::ivec3 coord);
 
     void make_move(glm::ivec3 src, glm::ivec3 dst);
-
-    void detect_check(Color c);
+    Piece temp_move(glm::ivec3 src, glm::ivec3 dst);
+    void undo_move(glm::ivec3 src, glm::ivec3 dst, Piece cap);
 
     Color turn() const { return m_turn; }
-    Color in_check() const { return m_check; }
 
     Piece &at(glm::ivec3 coord);
     void rook_moves(std::vector<glm::ivec3> &moves, glm::ivec3 coord, Piece p);
@@ -60,6 +59,5 @@ public:
     std::vector<glm::ivec3> m_moves;
 
     Color m_turn{ Color::WHITE };
-    Color m_check{ Color::NONE };
 };
 

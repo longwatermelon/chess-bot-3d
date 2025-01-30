@@ -86,15 +86,15 @@ void Prog::mainloop()
             SDL_RenderCopy(m_rend, tex, 0, &dst);
             SDL_DestroyTexture(tex);
 
-            Color check = m_board.in_check();
-            if (check != Color::NONE)
-            {
-                tex = util::render_text(m_rend, m_font, (std::string(check == Color::WHITE ? "White " : "Black ") + "is in check").c_str());
-                SDL_QueryTexture(tex, 0, 0, &dst.w, &dst.h);
-                dst.y += 20;
-                SDL_RenderCopy(m_rend, tex, 0, &dst);
-                SDL_DestroyTexture(tex);
-            }
+            // Color check = m_board.in_check();
+            // if (check != Color::NONE)
+            // {
+            //     tex = util::render_text(m_rend, m_font, (std::string(check == Color::WHITE ? "White " : "Black ") + "is in check").c_str());
+            //     SDL_QueryTexture(tex, 0, 0, &dst.w, &dst.h);
+            //     dst.y += 20;
+            //     SDL_RenderCopy(m_rend, tex, 0, &dst);
+            //     SDL_DestroyTexture(tex);
+            // }
 
             dst.y = 600 - 30;
             tex = util::render_text(m_rend, m_font, "LMB to interact");
